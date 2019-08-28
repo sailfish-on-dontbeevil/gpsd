@@ -150,21 +150,17 @@ ln -s ../gpsd.service %{buildroot}/lib/systemd/system/multi-user.target.wants/gp
 %{_libdir}/pkgconfig/libgps.pc
 
 %files devel
-%ifarch %{ix86} x86_64
 %{_bindir}/gpsfake
 %{_bindir}/gpscat
 %{_bindir}/gpsprof
-%endif
 %{_bindir}/gpsdecode
 
 
 %files clients
 %{_bindir}/cgps
-%ifarch %{ix86} x86_64
 %{_bindir}/gegps
 %{_bindir}/ubxtool
 %{_bindir}/zerk
-%endif
 %{_bindir}/gps2udp
 %{_bindir}/gpsctl
 %{_bindir}/gpsmon
