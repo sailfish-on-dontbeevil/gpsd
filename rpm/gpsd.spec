@@ -89,7 +89,7 @@ scons %{_smp_mflags}          	\
 
 # Fix python interpreter path.
 sed -e "s,#!/usr/bin/\(python[23]\?\|env \+python[23]\?\),#!/usr/bin/python3,g" -i \
-    gegps gpscat gpsfake xgps xgpsspeed gpsprof gps/*.py ubxtool zerk
+    clients/gegps clients/gpscat clients/gpsfake clients/xgps clients/xgpsspeed clients/gpsprof gps/*.py clients/ubxtool clients/zerk
 
 %install
 rm -rf $RPM_BUILD_ROOT
