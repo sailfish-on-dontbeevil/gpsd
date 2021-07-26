@@ -3,11 +3,9 @@ Version:        3.22
 Release:        0
 Summary:        Service daemon for mediating access to a GPS
 License:        BSD-3-Clause
-Group:          Hardware/Other
 Url:            http://www.catb.org/gpsd/
-Source0:        http://download-mirror.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 Source1:        gpsd.service
-#Patch1:         gpsd-2.96-glibc2.26.patch
 BuildRequires:  chrpath
 BuildRequires:  fdupes
 BuildRequires:  libcap-devel
@@ -38,31 +36,23 @@ The daemon will be quiescent when there are no clients asking for
 location information, and copes gracefully when the GPS is unplugged
 and replugged.
 
-%package devel
-Summary:        Client libraries in C and Python for talking to a running gpsd or GPS
-Group:          Development/Libraries/C and C++
-Requires:       libgps
-Requires:       %{name} = %{version}
-Requires:       pkgconfig
-Requires:       python-curses
-Requires:       python-gpsd = %{version}
-
-%description devel
-This package provides C header files for the gpsd shared libraries that
-manage access to a GPS for applications and debugging tools. You will
-need to have gpsd installed for it to work.
-
 %package -n libgps
 Summary:        Shared library for GPS applications
-Group:          System/Libraries
 
 %description -n libgps
 This package provides the shared library for gpsd and other GPS aware
 applications.
 
+%package -n python3-%{name}
+Summary:        Python libraries and modules for use with gpsd
+Requires:       libgps = %{version}
+
+%description -n python3-%{name}
+This package contains the python3 modules that manage access to a GPS for
+applications, and commonly useful python applications for use with gpsd.
+
 %package -n libgps-devel
 Summary:        Shared library for GPS applications development files
-Group:          Development/Libraries
 Requires:       libgps = %{version}
 
 %description -n libgps-devel
@@ -70,25 +60,15 @@ This package provides the development files for gpsd and other GPS aware
 applications.
 
 %package clients
-Summary:        Clients for gpsd with an X interface
-Group:          Hardware/Other
+Summary:        Clients for gpsd
 
 %description clients
-xgps is a simple test client for gpsd with an X interface. It displays
-current GPS position/time/velocity information and (for GPSes that
+gpsdmon is a simple test client for gpsd. It displays current
+GPS position/time/velocity information and (for GPSes that
 support the feature) the locations of accessible satellites.
 
-xgpsspeed is a speedometer that uses position information from the GPS.
-It accepts an -h option and optional argument as for gps, or a -v
-option to dump the package version and exit. Additionally, it accepts
--rv (reverse video) and -nc (needle color) options.
-
-cgps resembles xgps, but without the pictorial satellite display.  It
-can run on a serial terminal or terminal emulator.
-
 %prep
-%setup -q -n %{name}-%{version}/upstream
-#%patch1 -p1
+%autosetup -n %{name}-%{version}/upstream
 
 %build
 scons %{_smp_mflags}          	\
@@ -118,7 +98,7 @@ scons install
 
 mkdir -p %{buildroot}/%{_unittir}/multi-user.target.wants/
 
-install -D -m 644 %{SOURCE1} %{buildroot}/%{_unittir}/gpsd.service
+install -D -m 644 %{SOURCE1} %{buildroot}%{_unittir}/gpsd.service
 ln -s ../gpsd.service %{buildroot}/%{_unittir}/multi-user.target.wants/gpsd.service
 
 %post -n libgps -p /sbin/ldconfig
@@ -133,7 +113,6 @@ ln -s ../gpsd.service %{buildroot}/%{_unittir}/multi-user.target.wants/gpsd.serv
 %postun
 # Don't restart the service
 %systemd_postun gpsd.service gpsd.socket
-
 %files
 %{_unittir}/gpsd.service
 %{_unittir}/multi-user.target.wants/gpsd.service
@@ -143,24 +122,26 @@ ln -s ../gpsd.service %{buildroot}/%{_unittir}/multi-user.target.wants/gpsd.serv
 %files -n libgps
 %{_libdir}/libgps.so.*
 
+%files -n python3-%{name}
+%{_bindir}/gpsprof
+%{python3_sitearch}/gps*
+%exclude %{python3_sitearch}/gps/fake*
+%exclude %{python3_sitearch}/gps/__pycache__/fake*
+
 %files -n libgps-devel
 %{_includedir}/gps.h
 %{_includedir}/libgpsmm.h
 %{_libdir}/libgps.so
 %{_libdir}/pkgconfig/libgps.pc
 
-%files devel
-%{_bindir}/gpsfake
-%{_bindir}/gpscat
-%{_bindir}/gpsprof
-%{_bindir}/gpsdecode
-
-
 %files clients
+%{_bindir}/gpsdecode
 %{_bindir}/cgps
 %{_bindir}/gegps
 %{_bindir}/ubxtool
 %{_bindir}/zerk
+%{_bindir}/gpsfake
+%{_bindir}/gpscat
 %{_bindir}/gps2udp
 %{_bindir}/gpsctl
 %{_bindir}/gpsmon
