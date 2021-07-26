@@ -1,5 +1,5 @@
 Name:           gpsd
-Version:        3.19
+Version:        3.22
 Release:        0
 Summary:        Service daemon for mediating access to a GPS
 License:        BSD-3-Clause
@@ -116,10 +116,10 @@ rm -rf $RPM_BUILD_ROOT
 export DESTDIR=$RPM_BUILD_ROOT
 scons install
 
-mkdir -p %{buildroot}/lib/systemd/system/multi-user.target.wants/
+mkdir -p %{buildroot}/%{_unittir}/multi-user.target.wants/
 
-install -D -m 644 %{SOURCE1} %{buildroot}/lib/systemd/system/gpsd.service
-ln -s ../gpsd.service %{buildroot}/lib/systemd/system/multi-user.target.wants/gpsd.service
+install -D -m 644 %{SOURCE1} %{buildroot}/%{_unittir}/gpsd.service
+ln -s ../gpsd.service %{buildroot}/%{_unittir}/multi-user.target.wants/gpsd.service
 
 %post -n libgps -p /sbin/ldconfig
 %postun -n libgps -p /sbin/ldconfig
@@ -135,8 +135,8 @@ ln -s ../gpsd.service %{buildroot}/lib/systemd/system/multi-user.target.wants/gp
 %systemd_postun gpsd.service gpsd.socket
 
 %files
-/lib/systemd/system/gpsd.service
-/lib/systemd/system/multi-user.target.wants/gpsd.service
+%{_unittir}/gpsd.service
+%{_unittir}/multi-user.target.wants/gpsd.service
 %{_sbindir}/gpsd
 %{_sbindir}/gpsdctl
 
